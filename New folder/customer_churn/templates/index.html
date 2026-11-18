@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>ChurnSense - Customer Churn Prediction</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:"Segoe UI",Arial,sans-serif;
+}
+
+body{
+    background:#f5f7ff;
+    color:#18204d;
+}
+
+/* ================= WELCOME ================= */
+
+#welcomePage{
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:linear-gradient(135deg,#f7f8ff,#e8ebff);
+    padding:30px;
+}
+
+.welcome{
+    width:1100px;
+    min-height:620px;
+    background:white;
+    border-radius:30px;
+    padding:60px;
+    display:flex;
+    align-items:center;
+    box-shadow:0 20px 60px rgba(50,60,130,.12);
+}
+
+.welcome-left{
+    width:55%;
+}
+
+.logo{
+    font-size:24px;
+    font-weight:700;
+    color:#5146e5;
+    margin-bottom:70px;
+}
+
+.welcome h1{
+    font-size:55px;
+    line-height:1.05;
+}
+
+.welcome h1 span{
+    color:#5146e5;
+}
+
+.welcome p{
+    color:#69718c;
+    line-height:1.7;
+    max-width:500px;
+    margin:22px 0 30px;
+}
+
+.start-btn{
+    background:#5146e5;
+    border:none;
+    color:white;
+    padding:15px 30px;
+    border-radius:12px;
+    font-size:16px;
+    cursor:pointer;
+}
+
+.start-btn:hover{
+    background:#4037c9;
+}
+
+.welcome-right{
+    width:45%;
+    height:430px;
+    border-radius:30px;
+    background:linear-gradient(145deg,#eef0ff,#dfe4ff);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.visual{
+    width:250px;
+    height:250px;
+    border-radius:50%;
+    background:#cdd3ff;
+    position:relative;
+}
+
+.visual-card{
+    position:absolute;
+    background:white;
+    width:190px;
+    padding:20px;
+    border-radius:18px;
+    right:-80px;
+    bottom:20px;
+    box-shadow:0 15px 30px rgba(0,0,0,.1);
+}
+
+/* ================= APP ================= */
+
+#app{
+    display:none;
+}
+
+.sidebar{
+    width:240px;
+    height:100vh;
+    position:fixed;
+    background:#111a45;
+    color:white;
+    padding:25px 18px;
+}
+
+.brand{
+    font-size:23px;
+    font-weight:700;
+    margin-bottom:45px;
+}
+
+.brand span{
+    color:#8f88ff;
+}
+
+.nav{
+    padding:14px 18px;
+    margin:8px 0;
+    border-radius:10px;
+    color:#b9bfdc;
+    cursor:pointer;
+}
+
+.nav:hover,
+.nav.active{
+    background:#5146e5;
+    color:white;
+}
+
+.main{
+    margin-left:240px;
+    padding:25px 35px;
+}
+
+.topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:30px;
+}
+
+.search{
+    width:400px;
+    padding:13px 18px;
+    border:1px solid #dce0f0;
+    border-radius:12px;
+}
+
+.profile{
+    font-weight:600;
+}
+
+.page{
+    display:none;
+}
+
+.page.active{
+    display:block;
+}
+
+.title{
+    margin-bottom:25px;
+}
+
+.title h1{
+    font-size:30px;
+}
+
+.title p{
+    color:#747c98;
+    margin-top:5px;
+}
+
+/* ================= CARDS ================= */
+
+.cards{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:18px;
+    margin-bottom:25px;
+}
+
+.card{
+    background:white;
+    padding:22px;
+    border-radius:16px;
+    box-shadow:0 5px 20px rgba(40,50,100,.06);
+}
+
+.card small{
+    color:#737b98;
+}
+
+.card h2{
+    margin-top:10px;
+    font-size:28px;
+}
+
+/* ================= PANELS ================= */
+
+.grid{
+    display:grid;
+    grid-template-columns:2fr 1fr;
+    gap:20px;
+}
+
+.panel{
+    background:white;
+    padding:25px;
+    border-radius:16px;
+    box-shadow:0 5px 20px rgba(40,50,100,.06);
+    margin-bottom:20px;
+}
+
+.panel h3{
+    margin-bottom:20px;
+}
+
+.insight{
+    padding:14px;
+    background:#f5f6ff;
+    border-radius:10px;
+    margin-bottom:10px;
+    color:#59617d;
+}
+
+/* ================= TABLE ================= */
+
+.table-box{
+    overflow-x:auto;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th,
+td{
+    padding:13px 10px;
+    border-bottom:1px solid #eee;
+    text-align:left;
+    font-size:13px;
+    white-space:nowrap;
+}
+
+th{
+    color:#69718c;
+}
+
+.status{
+    padding:5px 10px;
+    border-radius:20px;
+    font-size:11px;
+}
+
+.churn{
+    background:#ffe3e7;
+    color:#e5485d;
+}
+
+.active{
+    background:#dcf8ed;
+    color:#159667;
+}
+
+/* ================= BUTTON ================= */
+
+.upload{
+    background:#5146e5;
+    color:white;
+    border:none;
+    padding:11px 18px;
+    border-radius:9px;
+    cursor:pointer;
+}
+
+#fileInput{
+    display:none;
+}
+
+/* ================= PREDICTION ================= */
+
+.prediction{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:25px;
+}
+
+.form-box,
+.result-box{
+    background:white;
+    padding:30px;
+    border-radius:18px;
+    box-shadow:0 5px 20px rgba(40,50,100,.06);
+}
+
+.input{
+    margin-bottom:17px;
+}
+
+.input label{
+    display:block;
+    margin-bottom:7px;
+    font-size:14px;
+    color:#5f6681;
+}
+
+.input input,
+.input select{
+    width:100%;
+    padding:12px;
+    border:1px solid #dfe2ee;
+    border-radius:9px;
+}
+
+.predict{
+    width:100%;
+    border:none;
+    padding:14px;
+    border-radius:10px;
+    background:#5146e5;
+    color:white;
+    cursor:pointer;
+    font-weight:600;
+}
+
+.result{
+    margin-top:25px;
+    padding:25px;
+    text-align:center;
+    border-radius:15px;
+    background:#fff0f1;
+}
+
+.probability{
+    font-size:40px;
+    font-weight:bold;
+    color:#e64c61;
+}
+
+/* ================= RISK ================= */
+
+.risks{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:20px;
+}
+
+.risk{
+    background:white;
+    padding:25px;
+    border-radius:16px;
+}
+
+.high{
+    border-left:5px solid #ef5364;
+}
+
+.medium{
+    border-left:5px solid #f2b544;
+}
+
+.low{
+    border-left:5px solid #36b985;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width:900px){
+
+    .sidebar{
+        width:70px;
+    }
+
+    .brand{
+        font-size:0;
+    }
+
+    .nav{
+        font-size:0;
+        text-align:center;
+    }
+
+    .main{
+        margin-left:70px;
+    }
+
+    .cards{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .welcome{
+        flex-direction:column;
+        padding:40px;
+    }
+
+    .welcome-left,
+    .welcome-right{
+        width:100%;
+    }
+
+    .welcome-right{
+        margin-top:40px;
+    }
+
+    .prediction{
+        grid-template-columns:1fr;
+    }
+
+    .risks{
+        grid-template-columns:1fr;
+    }
+}
+
+</style>
+</head>
+
+
+<body>
+
+
+<!-- ================= WELCOME PAGE ================= -->
+
+<section id="welcomePage">
+
+<div class="welcome">
+
+    <div class="welcome-left">
+
+        <div class="logo">
+            📊 ChurnSense
+        </div>
+
+        <h1>
+            Welcome to<br>
+            <span>ChurnSense</span>
+        </h1>
+
+        <p>
+            Predict customer churn using customer banking
+            data. Analyse customer behaviour, identify
+            high-risk customers and understand the factors
+            behind customer exit.
+        </p>
+
+        <button class="start-btn" onclick="startApp()">
+            Get Started →
+        </button>
+
+    </div>
+
+
+    <div class="welcome-right">
+
+        <div class="visual">
+
+            <div class="visual-card">
+
+                📊 Customer Analytics
+
+                <br><br>
+
+                <b>Churn Prediction</b>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</section>
+
+
+
+<!-- ================= MAIN APP ================= -->
+
+<section id="app">
+
+
+<!-- SIDEBAR -->
+
+<aside class="sidebar">
+
+    <div class="brand">
+        📊 Churn<span>Sense</span>
+    </div>
+
+    <div class="nav active"
+         onclick="showPage('dashboard',this)">
+        🏠 Dashboard
+    </div>
+
+    <div class="nav"
+         onclick="showPage('customers',this)">
+        👥 Customers
+    </div>
+
+    <div class="nav"
+         onclick="showPage('prediction',this)">
+        🤖 Prediction
+    </div>
+
+    <div class="nav"
+         onclick="showPage('analytics',this)">
+        📊 Analytics
+    </div>
+
+    <div class="nav"
+         onclick="showPage('risk',this)">
+        🛡️ Customer Risk
+    </div>
+
+</aside>
+
+
+
+<main class="main">
+
+
+<!-- TOPBAR -->
+
+<div class="topbar">
+
+    <input class="search"
+           placeholder="Search Customer ID or Surname...">
+
+    <div class="profile">
+        🔔 &nbsp; 👤 ChurnSense User
+    </div>
+
+</div>
+
+
+
+<!-- ================= DASHBOARD ================= -->
+
+<div id="dashboard" class="page active">
+
+<div class="title">
+
+    <h1>Dashboard</h1>
+
+    <p>
+        Customer churn overview and insights
+    </p>
+
+</div>
+
+
+<div class="cards">
+
+    <div class="card">
+        <small>Total Customers</small>
+        <h2 id="totalCustomers">—</h2>
+    </div>
+
+    <div class="card">
+        <small>Exited Customers</small>
+        <h2 id="exitedCustomers">—</h2>
+    </div>
+
+    <div class="card">
+        <small>Active Customers</small>
+        <h2 id="activeCustomers">—</h2>
+    </div>
+
+    <div class="card">
+        <small>Churn Rate</small>
+        <h2 id="churnRate">—</h2>
+    </div>
+
+</div>
+
+
+<div class="grid">
+
+    <div class="panel">
+
+        <h3>Customer Churn Overview</h3>
+
+        <canvas id="churnChart"></canvas>
+
+    </div>
+
+
+    <div class="panel">
+
+        <h3>Quick Insights</h3>
+
+        <div class="insight">
+            🌍 Geography affects customer churn.
+        </div>
+
+        <div class="insight">
+            👤 Age can influence customer exit.
+        </div>
+
+        <div class="insight">
+            💰 Balance and salary provide financial insights.
+        </div>
+
+        <div class="insight">
+            ⭐ Active members may show different churn behaviour.
+        </div>
+
+    </div>
+
+</div>
+
+</div>
+
+
+
+<!-- ================= CUSTOMERS ================= -->
+
+<div id="customers" class="page">
+
+<div class="title">
+
+    <h1>Customer Data</h1>
+
+    <p>
+        Customer records from the churn dataset
+    </p>
+
+</div>
+
+
+<div class="panel">
+
+    <h3>Customer Records</h3>
+
+
+    <div class="table-box">
+
+        <table>
+
+            <thead>
+
+            <tr>
+
+                <th>Customer ID</th>
+                <th>Surname</th>
+                <th>Credit Score</th>
+                <th>Geography</th>
+                <th>Gender</th>
+                <th>Age</th>
+                <th>Tenure</th>
+                <th>Balance</th>
+                <th>Products</th>
+                <th>Credit Card</th>
+                <th>Active</th>
+                <th>Salary</th>
+                <th>Exited</th>
+
+            </tr>
+
+            </thead>
+
+
+            <tbody id="customerTable"></tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+</div>
+
+
+
+<!-- ================= PREDICTION ================= -->
+
+<div id="prediction" class="page">
+
+<div class="title">
+
+    <h1>Churn Prediction</h1>
+
+    <p>
+        Enter customer details to predict customer churn.
+    </p>
+
+</div>
+
+
+<div class="prediction">
+
+
+<div class="form-box">
+
+    <h3>Customer Details</h3>
+
+    <br>
+
+
+    <div class="input">
+
+        <label>Credit Score</label>
+
+        <input id="creditScore"
+               type="number"
+               placeholder="Example: 650">
+
+    </div>
+
+
+    <div class="input">
+
+        <label>Gender</label>
+
+        <select id="gender">
+
+            <option value="">Select Gender</option>
+
+            <option value="Male">Male</option>
+
+            <option value="Female">Female</option>
+
+        </select>
+
+    </div>
+
+
+    <div class="input">
+
+        <label>Age</label>
+
+        <input id="age"
+               type="number"
+               placeholder="Example: 35">
+
+    </div>
+
+
+    <div class="input">
+
+        <label>Tenure</label>
+
+        <input id="tenure"
+               type="number"
+               placeholder="Example: 5">
+
+    </div>
+
+
+    <div class="input">
+
+        <label>Balance</label>
+
+        <input id="balance"
+               type="number"
+               placeholder="Example: 100000">
+
+    </div>
+
+
+    <div class="input">
+
+        <label>Number of Products</label>
+
+        <input id="numOfProducts"
+               type="number"
+               placeholder="Example: 2">
+
+    </div>
+
+
+    <div class="input">
+
+        <label>Has Credit Card?</label>
+
+        <select id="creditCard">
+
+            <option value="1">Yes</option>
+
+            <option value="0">No</option>
+
+        </select>
+
+    </div>
+
+
+    <div class="input">
+
+        <label>Is Active Member?</label>
+
+        <select id="activeMember">
+
+            <option value="1">Yes</option>
+
+            <option value="0">No</option>
+
+        </select>
+
+    </div>
+
+
+    <div class="input">
+
+        <label>Estimated Salary</label>
+
+        <input id="salary"
+               type="number"
+               placeholder="Example: 100000">
+
+    </div>
+
+
+    <button class="predict"
+            onclick="predictChurn()">
+
+        🤖 Predict Churn
+
+    </button>
+
+</div>
+
+
+
+<!-- RESULT -->
+
+<div class="result-box">
+
+    <h3>Prediction Result</h3>
+
+    <div id="predictionResult">
+
+        <p style="margin-top:40px;
+                  text-align:center;
+                  color:#777;">
+
+            Enter customer details and click
+            <b>Predict Churn</b>.
+
+        </p>
+
+    </div>
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<!-- ================= ANALYTICS ================= -->
+
+<div id="analytics" class="page">
+
+<div class="title">
+
+    <h1>Analytics</h1>
+
+    <p>
+        Analyse customer behaviour and churn patterns.
+    </p>
+
+</div>
+
+
+
+    <div class="card">
+
+        <small>Active Members</small>
+
+        <h2 id="memberCount">—</h2>
+
+    </div>
+
+</div>
+
+
+<div class="grid">
+
+
+    <div class="panel">
+
+        <h3>Churn by Gender</h3>
+
+        <canvas id="genderChart"></canvas>
+
+    </div>
+
+</div>
+
+</div>
+
+
+
+<!-- ================= RISK ================= -->
+
+<div id="risk" class="page">
+
+<div class="title">
+
+    <h1>Customer Risk Analysis</h1>
+
+    <p>
+        Identify customers who may leave the bank.
+    </p>
+
+</div>
+
+
+<div class="risks">
+
+
+    <div class="risk high">
+
+        <h3>🔴 High Risk</h3>
+
+        <h1 id="highRisk">—</h1>
+
+        <p>Potential churn customers</p>
+
+    </div>
+
+
+    <div class="risk medium">
+
+        <h3>🟠 Medium Risk</h3>
+
+        <h1 id="mediumRisk">—</h1>
+
+        <p>Customers requiring attention</p>
+
+    </div>
+
+
+    <div class="risk low">
+
+        <h3>🟢 Low Risk</h3>
+
+        <h1 id="lowRisk">—</h1>
+
+        <p>Lower churn probability</p>
+
+    </div>
+
+</div>
+
+
+<div class="panel">
+
+    <h3>Risk Factors</h3>
+
+    <div class="insight">
+        🔴 Low credit score may indicate higher risk.
+    </div>
+
+    <div class="insight">
+        👴 Age can be analysed as a churn factor.
+    </div>
+
+    <div class="insight">
+        💰 Balance and salary can provide financial insights.
+    </div>
+
+    <div class="insight">
+        ⭐ Inactive members may require attention.
+    </div>
+
+</div>
+
+</div>
+
+
+</main>
+
+</section>
+
+
+
+<script>
+
+/* ================= DATA ================= */
+
+let customers = [];
+
+let churnChart;
+let geoChart;
+let genderChart;
+
+
+/* ================= START APP ================= */
+
+function startApp(){
+
+    document.getElementById("welcomePage").style.display="none";
+
+    document.getElementById("app").style.display="block";
+
+    loadDemoData();
+
+}
+
+
+/* ================= NAVIGATION ================= */
+
+function showPage(pageId, element){
+
+    document.querySelectorAll(".page")
+        .forEach(page =>
+            page.classList.remove("active")
+        );
+
+    document.getElementById(pageId)
+        .classList.add("active");
+
+
+    document.querySelectorAll(".nav")
+        .forEach(nav =>
+            nav.classList.remove("active")
+        );
+
+    element.classList.add("active");
+
+}
+
+
+/* ================= DEMO DATA ================= */
+
+function loadDemoData(){
+
+    customers = [
+
+        {
+            id:"15634602",
+            surname:"Hargrave",
+            credit:619,
+            gender:"Female",
+            age:42,
+            tenure:2,
+            balance:0,
+            products:1,
+            card:1,
+            active:1,
+            salary:101348.88,
+            exited:1
+        },
+
+        {
+            id:"15647311",
+            surname:"Hill",
+            credit:608,
+            gender:"Female",
+            age:41,
+            tenure:1,
+            balance:83807.86,
+            products:1,
+            card:0,
+            active:1,
+            salary:112542.58,
+            exited:0
+        },
+
+        {
+            id:"15619304",
+            surname:"Onio",
+            credit:502,
+            gender:"Female",
+            age:42,
+            tenure:8,
+            balance:159660.80,
+            products:3,
+            card:1,
+            active:0,
+            salary:113931.57,
+            exited:1
+        },
+
+        {
+            id:"15701354",
+            surname:"Boni",
+            credit:699,
+            gender:"Male",
+            age:39,
+            tenure:1,
+            balance:0,
+            products:2,
+            card:0,
+            active:0,
+            salary:93826.63,
+            exited:0
+        },
+
+        {
+            id:"15737888",
+            surname:"Mitchell",
+            credit:850,
+            gender:"Male",
+            age:43,
+            tenure:2,
+            balance:125510.82,
+            products:1,
+            card:1,
+            active:1,
+            salary:79084.10,
+            exited:0
+        },
+
+        {
+            id:"15574012",
+            surname:"Chu",
+            credit:645,
+            gender:"Male",
+            age:44,
+            tenure:8,
+            balance:113755.78,
+            products:2,
+            card:1,
+            active:0,
+            salary:149756.71,
+            exited:1
+        }
+
+    ];
+
+
+    updateDashboard();
+
+    updateCustomers();
+
+    updateRisk();
+
+}
+
+
+/* ================= DASHBOARD ================= */
+
+function updateDashboard(){
+
+    let total = customers.length;
+
+    let exited =
+        customers.filter(c => c.exited === 1).length;
+
+    let active = total - exited;
+
+    let rate =
+        total > 0
+        ? ((exited / total) * 100).toFixed(1)
+        : 0;
+
+
+    document.getElementById("totalCustomers").innerText = total;
+
+    document.getElementById("exitedCustomers").innerText = exited;
+
+    document.getElementById("activeCustomers").innerText = active;
+
+    document.getElementById("churnRate").innerText = rate + "%";
+
+
+    createCharts();
+
+}
+
+
+/* ================= CUSTOMER TABLE ================= */
+
+function updateCustomers(){
+
+    let table =
+        document.getElementById("customerTable");
+
+    table.innerHTML = "";
+
+
+    customers.forEach(c => {
+
+        let row = `
+
+        <tr>
+
+            <td>${c.id}</td>
+
+            <td>${c.surname}</td>
+
+            <td>${c.credit}</td>
+
+            <td>${c.gender}</td>
+
+            <td>${c.age}</td>
+
+            <td>${c.tenure}</td>
+
+            <td>${c.balance}</td>
+
+            <td>${c.products}</td>
+
+            <td>${c.card ? "Yes" : "No"}</td>
+
+            <td>${c.active ? "Yes" : "No"}</td>
+
+            <td>${c.salary}</td>
+
+            <td>
+
+                <span class="status
+                    ${c.exited ? "churn" : "active"}">
+
+                    ${c.exited ? "Yes" : "No"}
+
+                </span>
+
+            </td>
+
+        </tr>
+
+        `;
+
+
+        table.innerHTML += row;
+
+    });
+
+}
+
+
+/* ================= RISK ================= */
+
+function updateRisk(){
+
+    let high =
+        customers.filter(
+            c => c.exited === 1
+        ).length;
+
+    let low =
+        customers.filter(
+            c => c.exited === 0
+        ).length;
+
+    let medium =
+        Math.max(
+            0,
+            Math.round(customers.length * 0.2)
+        );
+
+
+    document.getElementById("highRisk").innerText = high;
+
+    document.getElementById("mediumRisk").innerText = medium;
+
+    document.getElementById("lowRisk").innerText = low;
+
+}
+
+
+/* ================= CHARTS ================= */
+
+function createCharts(){
+
+    if(churnChart)
+        churnChart.destroy();
+
+
+    let exited =
+        customers.filter(
+            c => c.exited === 1
+        ).length;
+
+    let active =
+        customers.filter(
+            c => c.exited === 0
+        ).length;
+
+
+    churnChart = new Chart(
+        document.getElementById("churnChart"),
+        {
+            type:"doughnut",
+
+            data:{
+                labels:["Active","Exited"],
+
+                datasets:[{
+                    data:[active,exited]
+                }]
+            }
+        }
+    );
+
+    if(genderChart)
+        genderChart.destroy();
+
+
+    let male =
+        customers.filter(
+            c =>
+            c.gender === "Male" &&
+            c.exited === 1
+        ).length;
+
+
+    let female =
+        customers.filter(
+            c =>
+            c.gender === "Female" &&
+            c.exited === 1
+        ).length;
+
+
+    genderChart = new Chart(
+        document.getElementById("genderChart"),
+        {
+            type:"bar",
+
+            data:{
+                labels:[
+                    "Male",
+                    "Female"
+                ],
+
+                datasets:[{
+                    label:"Churned Customers",
+
+                    data:[
+                        male,
+                        female
+                    ]
+                }]
+            }
+        }
+    );
+
+}
+
+
+/* ================= PREDICTION ================= */
+async function predictChurn() {
+    const data = {
+        creditScore: document.getElementById('creditScore').value,
+        gender: document.getElementById('gender').value,
+        age: document.getElementById('age').value,
+        tenure: document.getElementById('tenure').value,
+        balance: document.getElementById('balance').value,
+        numOfProducts: document.getElementById('numOfProducts').value,
+        creditCard: document.getElementById('creditCard').value,
+        activeMember: document.getElementById('activeMember').value,
+        salary: document.getElementById('salary').value
+    };
+
+    const response = await fetch('/predict', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    });
+
+    const result = await response.json();
+    console.log(result);
+
+    if (result.error) {
+        alert("Error: " + result.error);
+    } else {
+        alert(result.result);
+    }
+}
+
+</script>
+
+</body>
+
+</html>
